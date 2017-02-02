@@ -5,10 +5,26 @@
 
     public class FindRootNode
     {
+        public static IDictionary<string, Node> nodes = new Dictionary<string, Node>();
+
         public static void Main()
         {
-            var nodes = new Dictionary<string, Node>();
+            ReadInput();
+            
+            //Reading searched tree nodes
+            Console.Write("Enter the two nodes in the format /FirstNode SecondNode/: ");
+            var searchedNodes = Console.ReadLine().Split(' ');
 
+            var firstNode = searchedNodes[0];
+            var secondNode = searchedNodes[1];
+
+            var result = GetFirstCommonParent(firstNode, secondNode);
+
+            Console.WriteLine("The Root parrent of {0} and {1} is {2} ", firstNode, secondNode, result.Name);
+        }
+
+        public static void ReadInput()
+        {
             //Reading input tree nodes
             Console.Write("Enter number of tree nodes: ");
             var treeNodesCount = int.Parse(Console.ReadLine());
@@ -49,34 +65,11 @@
                     }
                 }
             }
+        }
 
-            //Reading searched tree nodes
-            Console.Write("Enter the two nodes in the format /FirstNode SecondNode/: ");
-            var searchedNodes = Console.ReadLine().Split(' ');
-
-            var firstNodeToSearch = searchedNodes[0];
-            var secondNodeToSearch = searchedNodes[1];
-
-            var firstNodesParrents = new HashSet<Node>();
-
-            //Generating a path from first node to root node.
-            if (nodes.ContainsKey(firstNodeToSearch))
-            {
-                var currentNode = nodes[firstNodeToSearch];
-
-                // The global parent has no parent. It's parent is null.
-                while (currentNode.Parent != null)
-                {
-                    firstNodesParrents.Add(currentNode);
-                    currentNode = currentNode.Parent;
-                }
-
-                firstNodesParrents.Add(currentNode);
-            }
-            else
-            {
-                Console.WriteLine("No such node {0}!", firstNodeToSearch);
-            }
+        public static Node GetFirstCommonParent(string firstNodeToSearch, string secondNodeToSearch)
+        {
+            var pathForFirstNode = GeneratePath(firstNodeToSearch);
 
             //Searching for the first parant node from second node to root node
             if (nodes.ContainsKey(secondNodeToSearch))
@@ -86,7 +79,7 @@
                 // The global parent has no parent. It's parent is null.
                 while (currentNode.Parent != null)
                 {
-                    if (firstNodesParrents.Contains(currentNode))
+                    if (pathForFirstNode.Contains(currentNode))
                     {
                         break;
                     }
@@ -94,11 +87,37 @@
                     currentNode = currentNode.Parent;
                 }
 
-                Console.WriteLine("The Root parrent of {0} and {1} is {2} ", firstNodeToSearch, secondNodeToSearch, currentNode.Name);
+                return currentNode;
             }
             else
             {
-                Console.WriteLine("No such node {0}!", secondNodeToSearch);
+                throw new ArgumentException("No such node " + secondNodeToSearch);
+            }
+        }
+
+        public static ICollection<Node> GeneratePath(string node)
+        {
+            var nodesPath = new HashSet<Node>();
+
+            //Generating a path from given node to root node.
+            if (nodes.ContainsKey(node))
+            {
+                var currentNode = nodes[node];
+
+                // The global parent has no parent. It's parent is null.
+                while (currentNode.Parent != null)
+                {
+                    nodesPath.Add(currentNode);
+                    currentNode = currentNode.Parent;
+                }
+
+                nodesPath.Add(currentNode);
+
+                return nodesPath;
+            }
+            else
+            {
+                throw new ArgumentException("No such node " + node);
             }
         }
     }
