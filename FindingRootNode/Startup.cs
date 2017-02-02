@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public class FindRootNode
+    public class Startup
     {
         public static IDictionary<string, Node> nodes = new Dictionary<string, Node>();
 
